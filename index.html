@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Study Routine</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        h2 {
+            color: #34495e;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+
+        h3 {
+            color: #2980b9;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            background-color: #eaf6fd;
+            padding: 8px 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h3.current-day {
+            background-color: #d1ecf1; /* Light blue for current day */
+            border-left: 5px solid #007bff; /* Blue border for current day */
+            font-weight: bold;
+        }
+
+
+        .overall-goal, .dedicated-time {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .overall-goal strong, .dedicated-time strong {
+            color: #2c3e50;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-left: 4px solid #95a5a6;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        li strong {
+            color: #2c3e50;
+        }
+
+        .session-duration {
+            font-style: italic;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        .session-notes {
+            margin-top: 5px;
+            font-size: 0.95em;
+            color: #444;
+        }
+
+        .break {
+            background-color: #f0f8ff; /* Lighter blue for breaks */
+            border-left-color: #a0cff7;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            h3 {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My New Study Routine: The Plan to Boost My Grades</h1>
+
+        <div class="overall-goal">
+            <strong>Overall Goal:</strong> Massively improve academic performance, focusing on Math and Science.
+        </div>
+        <div class="dedicated-time">
+            <strong>Dedicated Study Time:</strong> Every evening from 7:30 PM (or 8:00 PM) until 10:00 PM (or 10:30 PM) - solid 2 to 2.5 hours.
+        </div>
+
+        <h2>My Weekly Subject Schedule</h2>
+
+        <div id="studySchedule">
+            <h3 data-day="Saturday">Saturday Evenings <span class="time-block">(7:30 PM / 8:00 PM - 10:00 PM / 10:30 PM)</span></h3>
+            <ul>
+                <li>
+                    <strong>Bangla</strong> <span class="session-duration">(First Subject: 7:30/8:00 PM - 8:45/9:00 PM)</span>
+                    <div class="session-notes">Focus on class/tutor material, or get a head start on upcoming topics.</div>
+                </li>
+                <li class="break">
+                    <strong>Short Break</strong> <span class="session-duration">(5-10 minutes: 8:45/9:00 PM - 8:55/9:05 PM)</span>
+                    <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                </li>
+                <li>
+                    <strong>BGS (Bangladesh and Global Studies)</strong> <span class="session-duration">(Second Subject: 8:55/9:05 PM - 10:00/10:15 PM)</span>
+                    <div class="session-notes">Review recent chapters, prepare for discussions/quizzes.</div>
+                </li>
+                <li>
+                    <strong>Quick Review & Plan</strong> <span class="session-duration">(5-10 minutes: 10:00/10:15 PM - 10:10/10:25 PM)</span>
+                    <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                </li>
+            </ul>
+
+            <h3 data-day="Sunday">Sunday Evenings <span class="time-block">(7:30 PM / 8:00 PM - 10:00 PM / 10:30 PM)</span></h3>
+            <ul>
+                <li>
+                    <strong>Math</strong> <span class="session-duration">(First Subject: 7:30/8:00 PM - 8:45/9:00 PM)</span>
+                    <div class="session-notes">Crucial Math day. Build understanding, solve practice problems, tackle toughest areas.</div>
+                </li>
+                <li class="break">
+                    <strong>Short Break</strong> <span class="session-duration">(5-10 minutes: 8:45/9:00 PM - 8:55/9:05 PM)</span>
+                    <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                </li>
+                <li>
+                    <strong>Science</strong> <span class="session-duration">(Second Subject: 8:55/9:05 PM - 10:00/10:15 PM)</span>
+                    <div class="session-notes">Crucial Science day. Understand scientific principles, draw diagrams, apply learning.</div>
+                </li>
+                <li>
+                    <strong>Quick Review & Plan</strong> <span class="session-duration">(5-10 minutes: 10:00/10:15 PM - 10:10/10:25 PM)</span>
+                    <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                </li>
+            </ul>
+
+            <h3 data-day="Monday">Monday Evenings <span class="time-block">(7:30 PM / 8:00 PM - 10:00 PM / 10:30 PM)</span></h3>
+            <ul>
+                <li>
+                    <strong>Islam Education</strong> <span class="session-duration">(First Subject: 7:30/8:00 PM - 8:45/9:00 PM)</span>
+                    <div class="session-notes">Review key concepts, memorize info, prepare for lessons.</div>
+                </li>
+                <li class="break">
+                    <strong>Short Break</strong> <span class="session-duration">(5-10 minutes: 8:45/9:00 PM - 8:55/9:05 PM)</span>
+                    <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                </li>
+                <li>
+                    <strong>ICT (Information and Communications Technology)</strong> <span class="session-duration">(Second Subject: 8:55/9:05 PM - 10:00/10:15 PM)</span>
+                    <div class="session-notes">Practice software, review theory, work on assignments.</div>
+                </li>
+                <li>
+                    <strong>Quick Review & Plan</strong> <span class="session-duration">(5-10 minutes: 10:00/10:15 PM - 10:10/10:25 PM)</span>
+                    <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                </li>
+            </ul>
+
+            <h3 data-day="Tuesday">Tuesday Evenings <span class="time-block">(7:30 PM / 8:00 PM - 10:00 PM / 10:30 PM)</span></h3>
+            <ul>
+                <li>
+                    <strong>Math</strong> <span class="session-duration">(First Subject: 7:30/8:00 PM - 8:45/9:00 PM)</span>
+                    <div class="session-notes">Deep dive into problem-solving, focus on common mistakes, improve speed/accuracy.</div>
+                </li>
+                <li class="break">
+                    <strong>Short Break</strong> <span class="session-duration">(5-10 minutes: 8:45/9:00 PM - 8:55/9:05 PM)</span>
+                    <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                </li>
+                <li>
+                    <strong>Science</strong> <span class="session-duration">(Second Subject: 8:55/9:05 PM - 10:00/10:15 PM)</span>
+                    <div class="session-notes">Work on challenging chapters, connect ideas, attempt past paper questions.</div>
+                </li>
+                <li>
+                    <strong>Quick Review & Plan</strong> <span class="session-duration">(5-10 minutes: 10:00/10:15 PM - 10:10/10:25 PM)</span>
+                    <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                </li>
+            </ul>
+
+            <h3 data-day="Wednesday">Wednesday Evenings <span class="time-block">(7:30 PM / 8:00 PM - 10:00 PM / 10:30 PM)</span></h3>
+            <ul>
+                <li>
+                    <strong>Bangla</strong> <span class="session-duration">(First Subject: 7:30/8:00 PM - 8:45/9:00 PM)</span>
+                    <div class="session-notes">Work on grammar, essay writing, or dive into Sahitto Konika/Anondopath.</div>
+                </li>
+                <li class="break">
+                    <strong>Short Break</strong> <span class="session-duration">(5-10 minutes: 8:45/9:00 PM - 8:55/9:05 PM)</span>
+                    <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                </li>
+                <li>
+                    <strong>BGS (Bangladesh and Global Studies)</strong> <span class="session-duration">(Second Subject: 8:55/9:05 PM - 10:00/10:15 PM)</span>
+                    <div class="session-notes">Review BGS chapters, focus on maps, historical events, important dates.</div>
+                </li>
+                <li>
+                    <strong>Quick Review & Plan</strong> <span class="session-duration">(5-10 minutes: 10:00/10:15 PM - 10:10/10:25 PM)</span>
+                    <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                </li>
+            </ul>
+
+            <h3 data-day="Thursday">Thursday Evenings <span class="time-block">(7:30 PM / 8:00 PM - 10:00 PM / 10:30 PM)</span></h3>
+            <ul>
+                <li>
+                    <strong>Bangla</strong> <span class="session-duration">(Approx. 40 minutes)</span>
+                    <div class="session-notes">Quick review or short, specific task.</div>
+                </li>
+                <li>
+                    <strong>BGS (Bangladesh and Global Studies)</strong> <span class="session-duration">(Approx. 40 minutes)</span>
+                    <div class="session-notes">Quick review or short, specific task.</div>
+                </li>
+                <li>
+                    <strong>Islam Education</strong> <span class="session-duration">(Approx. 40 minutes)</span>
+                    <div class="session-notes">Quick review or short, specific task.</div>
+                </li>
+                <li>
+                    <strong>ICT (Information and Communications Technology)</strong> <span class="session-duration">(Approx. 40 minutes)</span>
+                    <div class="session-notes">Quick review or short, specific task.</div>
+                </li>
+                <li>
+                    <strong>Quick Review & Plan</strong> <span class="session-duration">(5-10 minutes: End of session)</span>
+                    <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                </li>
+            </ul>
+
+            <h3 data-day="Friday">Friday Evenings <span class="time-block">(7:30 PM / 8:00 PM - 10:00 PM / 10:30 PM)</span></h3>
+            <ul>
+                <li>
+                    <strong>Math</strong> <span class="session-duration">(First Subject: 7:30/8:00 PM - 8:45/9:00 PM)</span>
+                    <div class="session-notes">Review all Math topics from the week, tackle complex problems, or get a head start.</div>
+                </li>
+                <li class="break">
+                    <strong>Short Break</strong> <span class="session-duration">(5-10 minutes: 8:45/9:00 PM - 8:55/9:05 PM)</span>
+                    <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                </li>
+                <li>
+                    <strong>Science</strong> <span class="session-duration">(Second Subject: 8:55/9:05 PM - 10:00/10:15 PM)</span>
+                    <div class="session-notes">Comprehensive review of the week's Science concepts, connect ideas.</div>
+                </li>
+                <li>
+                    <strong>Quick Review & Plan</strong> <span class="session-duration">(5-10 minutes: 10:00/10:15 PM - 10:10/10:25 PM)</span>
+                    <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                </li>
+                <li>
+                    <strong>Weekly Topic Planning</strong> <span class="session-duration">(End of session)</span>
+                    <div class="session-notes">Look ahead at syllabus/assignments, decide topics for next week. Flexibility is key!</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Get the current day of the week (0 for Sunday, 1 for Monday, etc.)
+        const date = new Date();
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const currentDay = days[date.getDay()];
+
+        // Find the heading for the current day and add a class to highlight it
+        const currentDayHeading = document.querySelector(`h3[data-day="${currentDay}"]`);
+        if (currentDayHeading) {
+            currentDayHeading.classList.add('current-day');
+        }
+    </script>
+</body>
+</html>
