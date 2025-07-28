@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Study Routine</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Clock and Date Styles */
+        #liveClockContainer {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #e0f2f7;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        #currentDayDisplay {
+            font-size: 1.2em;
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #liveClock {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        #currentDateDisplay {
+            font-size: 1.1em;
+            color: #555;
+        }
+
+
+        h2 {
+            color: #34495e;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+
+        /* Styling for daily headings (accordion titles) */
+        .day-header {
+            color: #2980b9;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 0px;
+            background-color: #eaf6fd;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .day-header:hover {
+            background-color: #d8edf8;
+        }
+
+        .day-header.current-day-highlight {
+            background-color: #d1ecf1;
+            border-left: 5px solid #007bff;
+            font-weight: bold;
+        }
+
+        .day-header .toggle-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* Content for each day (hidden by default) */
+        .day-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            padding: 0 15px;
+            background-color: #ffffff;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+        .day-content.active {
+            max-height: 1000px;
+            padding: 15px;
+            transition: max-height 0.5s ease-in, padding 0.3s ease-in;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-left: 4px solid #95a5a6;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease, border-left-color 0.3s ease;
+            cursor: pointer; /* Indicate clickable for subjects */
+        }
+
+        li:last-child {
+            margin-bottom: 0;
+        }
+
+        li strong {
+            color: #2c3e50;
+        }
+
+        .session-duration {
+            font-style: italic;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        .session-notes {
+            margin-top: 5px;
+            font-size: 0.95em;
+            color: #444;
+        }
+
+        .break {
+            background-color: #f0f8ff;
+            border-left-color: #a0cff7;
+            cursor: default; /* Breaks are not clickable for syllabus */
+        }
+
+        /* Styles for current time highlighting */
+        .current-active {
+            background-color: #ffcccc !important;
+            border-left-color: #ff0000 !important;
+            box-shadow: 0 2px 8px rgba(255, 0, 0, 0.2) !important;
+        }
+
+        .completed {
+            background-color: #e0e0e0 !important;
+            border-left-color: #888888 !important;
+            color: #666 !important;
+        }
+
+        .completed strong, .completed .session-duration, .completed .session-notes {
+            color: #666 !important;
+        }
+
+        /* Styles for the pinned current day */
+        .current-day-pinned-container {
+            background-color: #e1f5fe;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .current-day-pinned-container h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #a7d9f7;
+            color: #0d47a1;
+        }
+
+        .current-day-pinned-container ul {
+            padding-left: 0;
+        }
+
+        .current-day-pinned-container li {
+            background-color: #ffffff;
+            border-left-color: #64b5f6;
+        }
+
+        /* NEW: Modal Styles */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            display: flex; /* Use flexbox for centering */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+            padding: 10px; /* Add some padding for smaller screens */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto; /* For browsers that don't support flex centering */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            max-width: 90%; /* Max width for responsiveness */
+            width: 500px; /* Desired width */
+            position: relative;
+            animation: fadeIn 0.3s ease-out; /* Simple animation */
+            max-height: 90vh; /* Max height to allow scrolling */
+            overflow-y: auto; /* Scroll if content is too long */
+        }
+
+        .modal-content h3 {
+            color: #2980b9;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .modal-content ul {
+            list-style: decimal; /* Numbered list for chapters */
+            padding-left: 20px;
+        }
+
+        .modal-content ul li {
+            background-color: #eaf6fd; /* Light blue background for chapters */
+            border-left: 4px solid #007bff;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+            box-shadow: none; /* Remove extra shadow */
+            cursor: default; /* Not clickable */
+        }
+
+        .modal-content ul li:hover {
+            background-color: #eaf6fd; /* No hover effect on chapters */
+        }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            #liveClock {
+                font-size: 2em;
+            }
+            #currentDayDisplay, #currentDateDisplay {
+                font-size: 1em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            .day-header {
+                font-size: 1.1em;
+                padding: 8px 12px;
+            }
+            .day-header .toggle-icon {
+                font-size: 1em;
+            }
+            li {
+                padding: 12px;
+            }
+            .session-notes {
+                font-size: 0.9em;
+            }
+            .current-day-pinned-container {
+                padding: 15px;
+            }
+            /* Modal adjustments for small screens */
+            .modal-content {
+                width: 95%; /* Take up more width */
+                padding: 20px;
+            }
+            .modal-content h3 {
+                font-size: 1.5em;
+            }
+            .modal-content ul li {
+                font-size: 0.95em;
+            }
+            .close-button {
+                font-size: 24px;
+                top: 8px;
+                right: 12px;
+            }
+        }
+
+        /* Keyframe animation for modal */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="liveClockContainer">
+            <div id="currentDayDisplay"></div>
+            <div id="liveClock"></div>
+            <div id="currentDateDisplay"></div>
+        </div>
+
+        <div id="pinnedCurrentDay" class="current-day-pinned-container">
+            </div>
+
+        <h2>My Weekly Subject Schedule</h2>
+
+        <div id="allOtherDaysSchedule">
+            <h3 class="day-header" data-day="Saturday">Saturday Evenings <span class="time-block">(7:30 PM - 10:30 PM)</span><span class="toggle-icon">+</span></h3>
+            <div class="day-content">
+                <ul>
+                    <li id="sat_block_1" data-start-time="19:30" data-end-time="20:55" data-subject="Bangla">
+                        <strong>Bangla</strong> <span class="session-duration">(7:30 PM - 8:55 PM)</span>
+                        <div class="session-notes">Focus on class/tutor material, or get a head start on upcoming topics.</div>
+                    </li>
+                    <li id="sat_block_break1" class="break" data-start-time="20:55" data-end-time="21:05">
+                        <strong>Short Break</strong> <span class="session-duration">(8:55 PM - 9:05 PM)</span>
+                        <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                    </li>
+                    <li id="sat_block_2" data-start-time="21:05" data-end-time="22:15" data-subject="BGS">
+                        <strong>BGS (Bangladesh and Global Studies)</strong> <span class="session-duration">(9:05 PM - 10:15 PM)</span>
+                        <div class="session-notes">Review recent chapters, prepare for discussions/quizzes.</div>
+                    </li>
+                    <li id="sat_block_review" data-start-time="22:15" data-end-time="22:30">
+                        <strong>Quick Review & Plan</strong> <span class="session-duration">(10:15 PM - 10:30 PM)</span>
+                        <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                    </li>
+                </ul>
+            </div>
+
+            <h3 class="day-header" data-day="Sunday">Sunday Evenings <span class="time-block">(7:30 PM - 10:30 PM)</span><span class="toggle-icon">+</span></h3>
+            <div class="day-content">
+                <ul>
+                    <li id="sun_block_1" data-start-time="19:30" data-end-time="20:55" data-subject="Math">
+                        <strong>Math</strong> <span class="session-duration">(7:30 PM - 8:55 PM)</span>
+                        <div class="session-notes">Crucial Math day. Build understanding, solve practice problems, tackle toughest areas.</div>
+                    </li>
+                    <li id="sun_block_break1" class="break" data-start-time="20:55" data-end-time="21:05">
+                        <strong>Short Break</strong> <span class="session-duration">(8:55 PM - 9:05 PM)</span>
+                        <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                    </li>
+                    <li id="sun_block_2" data-start-time="21:05" data-end-time="22:15" data-subject="Science">
+                        <strong>Science</strong> <span class="session-duration">(9:05 PM - 10:15 PM)</span>
+                        <div class="session-notes">Crucial Science day. Understand scientific principles, draw diagrams, apply learning.</div>
+                    </li>
+                    <li id="sun_block_review" data-start-time="22:15" data-end-time="22:30">
+                        <strong>Quick Review & Plan</strong> <span class="session-duration">(10:15 PM - 10:30 PM)</span>
+                        <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                    </li>
+                </ul>
+            </div>
+
+            <h3 class="day-header" data-day="Monday">Monday Evenings <span class="time-block">(7:30 PM - 10:30 PM)</span><span class="toggle-icon">+</span></h3>
+            <div class="day-content">
+                <ul>
+                    <li id="mon_block_1" data-start-time="19:30" data-end-time="20:55" data-subject="Islam Education">
+                        <strong>Islam Education</strong> <span class="session-duration">(7:30 PM - 8:55 PM)</span>
+                        <div class="session-notes">Review key concepts, memorize info, prepare for lessons.</div>
+                    </li>
+                    <li id="mon_block_break1" class="break" data-start-time="20:55" data-end-time="21:05">
+                        <strong>Short Break</strong> <span class="session-duration">(8:55 PM - 9:05 PM)</span>
+                        <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                    </li>
+                    <li id="mon_block_2" data-start-time="21:05" data-end-time="22:15" data-subject="ICT">
+                        <strong>ICT (Information and Communications Technology)</strong> <span class="session-duration">(9:05 PM - 10:15 PM)</span>
+                        <div class="session-notes">Practice software, review theory, work on assignments.</div>
+                    </li>
+                    <li id="mon_block_review" data-start-time="22:15" data-end-time="22:30">
+                        <strong>Quick Review & Plan</strong> <span class="session-duration">(10:15 PM - 10:30 PM)</span>
+                        <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                    </li>
+                </ul>
+            </div>
+
+            <h3 class="day-header" data-day="Tuesday">Tuesday Evenings <span class="time-block">(7:30 PM - 10:30 PM)</span><span class="toggle-icon">+</span></h3>
+            <div class="day-content">
+                <ul>
+                    <li id="tue_block_1" data-start-time="19:30" data-end-time="20:55" data-subject="Math">
+                        <strong>Math</strong> <span class="session-duration">(7:30 PM - 8:55 PM)</span>
+                        <div class="session-notes">Deep dive into problem-solving, focus on common mistakes, improve speed/accuracy.</div>
+                    </li>
+                    <li id="tue_block_break1" class="break" data-start-time="20:55" data-end-time="21:05">
+                        <strong>Short Break</strong> <span class="session-duration">(8:55 PM - 9:05 PM)</span>
+                        <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                    </li>
+                    <li id="tue_block_2" data-start-time="21:05" data-end-time="22:15" data-subject="Science">
+                        <strong>Science</strong> <span class="session-duration">(9:05 PM - 10:15 PM)</span>
+                        <div class="session-notes">Work on challenging chapters, connect ideas, attempt past paper questions.</div>
+                    </li>
+                    <li id="tue_block_review" data-start-time="22:15" data-end-time="22:30">
+                        <strong>Quick Review & Plan</strong> <span class="session-duration">(10:15 PM - 10:30 PM)</span>
+                        <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                    </li>
+                </ul>
+            </div>
+
+            <h3 class="day-header" data-day="Wednesday">Wednesday Evenings <span class="time-block">(7:30 PM - 10:30 PM)</span><span class="toggle-icon">+</span></h3>
+            <div class="day-content">
+                <ul>
+                    <li id="wed_block_1" data-start-time="19:30" data-end-time="20:55" data-subject="Bangla">
+                        <strong>Bangla</strong> <span class="session-duration">(7:30 PM - 8:55 PM)</span>
+                        <div class="session-notes">Work on grammar, essay writing, or dive into Sahitto Konika/Anondopath.</div>
+                    </li>
+                    <li id="wed_block_break1" class="break" data-start-time="20:55" data-end-time="21:05">
+                        <strong>Short Break</strong> <span class="session-duration">(8:55 PM - 9:05 PM)</span>
+                        <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                    </li>
+                    <li id="wed_block_2" data-start-time="21:05" data-end-time="22:15" data-subject="BGS">
+                        <strong>BGS (Bangladesh and Global Studies)</strong> <span class="session-duration">(9:05 PM - 10:15 PM)</span>
+                        <div class="session-notes">Review BGS chapters, focus on maps, historical events, important dates.</div>
+                    </li>
+                    <li id="wed_block_review" data-start-time="22:15" data-end-time="22:30">
+                        <strong>Quick Review & Plan</strong> <span class="session-duration">(10:15 PM - 10:30 PM)</span>
+                        <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                    </li>
+                </ul>
+            </div>
+
+            <h3 class="day-header" data-day="Thursday">Thursday Evenings <span class="time-block">(7:30 PM - 10:30 PM)</span><span class="toggle-icon">+</span></h3>
+            <div class="day-content">
+                <ul>
+                    <li id="thu_block_1" data-start-time="19:30" data-end-time="20:12" data-subject="Bangla">
+                        <strong>Bangla</strong> <span class="session-duration">(7:30 PM - 8:12 PM)</span>
+                        <div class="session-notes">Quick review or short, specific task.</div>
+                    </li>
+                    <li id="thu_block_2" data-start-time="20:12" data-end-time="20:54" data-subject="BGS">
+                        <strong>BGS (Bangladesh and Global Studies)</strong> <span class="session-duration">(8:12 PM - 8:54 PM)</span>
+                        <div class="session-notes">Quick review or short, specific task.</div>
+                    </li>
+                    <li id="thu_block_3" data-start-time="20:54" data-end-time="21:36" data-subject="Islam Education">
+                        <strong>Islam Education</strong> <span class="session-duration">(8:54 PM - 9:36 PM)</span>
+                        <div class="session-notes">Quick review or short, specific task.</div>
+                    </li>
+                    <li id="thu_block_4" data-start-time="21:36" data-end-time="22:18" data-subject="ICT">
+                        <strong>ICT (Information and Communications Technology)</strong> <span class="session-duration">(9:36 PM - 10:18 PM)</span>
+                        <div class="session-notes">Quick review or short, specific task.</div>
+                    </li>
+                    <li id="thu_block_review" data-start-time="22:18" data-end-time="22:30">
+                        <strong>Quick Review & Plan</strong> <span class="session-duration">(10:18 PM - 10:30 PM)</span>
+                        <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                    </li>
+                </ul>
+            </div>
+
+            <h3 class="day-header" data-day="Friday">Friday Evenings <span class="time-block">(7:30 PM - 10:30 PM)</span><span class="toggle-icon">+</span></h3>
+            <div class="day-content">
+                <ul>
+                    <li id="fri_block_1" data-start-time="19:30" data-end-time="20:55" data-subject="Math">
+                        <strong>Math</strong> <span class="session-duration">(7:30 PM - 8:55 PM)</span>
+                        <div class="session-notes">Review all Math topics from the week, tackle complex problems, or get a head start.</div>
+                    </li>
+                    <li id="fri_block_break1" class="break" data-start-time="20:55" data-end-time="21:05">
+                        <strong>Short Break</strong> <span class="session-duration">(8:55 PM - 9:05 PM)</span>
+                        <div class="session-notes">Stretch, grab a drink, step away from desk. No phone scrolling!</div>
+                    </li>
+                    <li id="fri_block_2" data-start-time="21:05" data-end-time="22:15" data-subject="Science">
+                        <strong>Science</strong> <span class="session-duration">(9:05 PM - 10:15 PM)</span>
+                        <div class="session-notes">Comprehensive review of the week's Science concepts, connect ideas.</div>
+                    </li>
+                    <li id="fri_block_review" data-start-time="22:15" data-end-time="22:30">
+                        <strong>Quick Review & Plan</strong> <span class="session-duration">(10:15 PM - 10:30 PM)</span>
+                        <div class="session-notes">Go over learned material, jot down tomorrow's tasks for organization.</div>
+                    </li>
+                    <li id="fri_block_planning" data-start-time="22:30" data-end-time="22:45">
+                        <strong>Weekly Topic Planning</strong> <span class="session-duration">(10:30 PM - 10:45 PM)</span>
+                        <div class="session-notes">Look ahead at syllabus/assignments, decide topics for next week. Flexibility is key!</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="syllabusModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="modalSubjectTitle"></h3>
+            <ul id="modalChapterList">
+                </ul>
+        </div>
+    </div>
+
+    <script>
+        // Data structure for your study routine
+        const studyPlanData = {
+            "Saturday": {
+                "time_block_display": "7:30 PM - 10:30 PM",
+                "sessions": [
+                    { "id": "sat_block_1", "subject": "Bangla", "duration": "(7:30 PM - 8:55 PM)", "notes": "Focus on class/tutor material, or get a head start on upcoming topics.", "start_time": "19:30", "end_time": "20:55" },
+                    { "id": "sat_block_break1", "subject": "Short Break", "duration": "(8:55 PM - 9:05 PM)", "notes": "Stretch, grab a drink, step away from desk. No phone scrolling!", "start_time": "20:55", "end_time": "21:05", "is_break": true },
+                    { "id": "sat_block_2", "subject": "BGS", "duration": "(9:05 PM - 10:15 PM)", "notes": "Review recent chapters, prepare for discussions/quizzes.", "start_time": "21:05", "end_time": "22:15" },
+                    { "id": "sat_block_review", "subject": "Quick Review & Plan", "duration": "(10:15 PM - 10:30 PM)", "notes": "Go over learned material, jot down tomorrow's tasks for organization.", "start_time": "22:15", "end_time": "22:30" }
+                ]
+            },
+            "Sunday": {
+                "time_block_display": "7:30 PM - 10:30 PM",
+                "sessions": [
+                    { "id": "sun_block_1", "subject": "Math", "duration": "(7:30 PM - 8:55 PM)", "notes": "Crucial Math day. Build understanding, solve practice problems, tackle toughest areas.", "start_time": "19:30", "end_time": "20:55" },
+                    { "id": "sun_block_break1", "subject": "Short Break", "duration": "(8:55 PM - 9:05 PM)", "notes": "Stretch, grab a drink, step away from desk. No phone scrolling!", "start_time": "20:55", "end_time": "21:05", "is_break": true },
+                    { "id": "sun_block_2", "subject": "Science", "duration": "(9:05 PM - 10:15 PM)", "notes": "Crucial Science day. Understand scientific principles, draw diagrams, apply learning.", "start_time": "21:05", "end_time": "22:15" },
+                    { "id": "sun_block_review", "subject": "Quick Review & Plan", "duration": "(10:15 PM - 10:30 PM)", "notes": "Go over learned material, jot down tomorrow's tasks for organization.", "start_time": "22:15", "end_time": "22:30" }
+                ]
+            },
+            "Monday": {
+                "time_block_display": "7:30 PM - 10:30 PM",
+                "sessions": [
+                    { "id": "mon_block_1", "subject": "Islam Education", "duration": "(7:30 PM - 8:55 PM)", "notes": "Review key concepts, memorize info, prepare for lessons.", "start_time": "19:30", "end_time": "20:55" },
+                    { "id": "mon_block_break1", "subject": "Short Break", "duration": "(8:55 PM - 9:05 PM)", "notes": "Stretch, grab a drink, step away from desk. No phone scrolling!", "start_time": "20:55", "end_time": "21:05", "is_break": true },
+                    { "id": "mon_block_2", "subject": "ICT", "duration": "(9:05 PM - 10:15 PM)", "notes": "Practice software, review theory, work on assignments.", "start_time": "21:05", "end_time": "22:15" },
+                    { "id": "mon_block_review", "subject": "Quick Review & Plan", "duration": "(10:15 PM - 10:30 PM)", "notes": "Go over learned material, jot down tomorrow's tasks for organization.", "start_time": "22:15", "end_time": "22:30" }
+                ]
+            },
+            "Tuesday": {
+                "time_block_display": "7:30 PM - 10:30 PM",
+                "sessions": [
+                    { "id": "tue_block_1", "subject": "Math", "duration": "(7:30 PM - 8:55 PM)", "notes": "Deep dive into problem-solving, focus on common mistakes, improve speed/accuracy.", "start_time": "19:30", "end_time": "20:55" },
+                    { "id": "tue_block_break1", "subject": "Short Break", "duration": "(8:55 PM - 9:05 PM)", "notes": "Stretch, grab a drink, step away from desk. No phone scrolling!", "start_time": "20:55", "end_time": "21:05", "is_break": true },
+                    { "id": "tue_block_2", "subject": "Science", "duration": "(9:05 PM - 10:15 PM)", "notes": "Work on challenging chapters, connect ideas, attempt past paper questions.", "start_time": "21:05", "end_time": "22:15" },
+                    { "id": "tue_block_review", "subject": "Quick Review & Plan", "duration": "(10:15 PM - 10:30 PM)", "notes": "Go over learned material, jot down tomorrow's tasks for organization.", "start_time": "22:15", "end_time": "22:30" }
+                ]
+            },
+            "Wednesday": {
+                "time_block_display": "7:30 PM - 10:30 PM",
+                "sessions": [
+                    { "id": "wed_block_1", "subject": "Bangla", "duration": "(7:30 PM - 8:55 PM)", "notes": "Work on grammar, essay writing, or dive into Sahitto Konika/Anondopath.", "start_time": "19:30", "end_time": "20:55" },
+                    { "id": "wed_block_break1", "subject": "Short Break", "duration": "(8:55 PM - 9:05 PM)", "notes": "Stretch, grab a drink, step away from desk. No phone scrolling!", "start_time": "20:55", "end_time": "21:05", "is_break": true },
+                    { "id": "wed_block_2", "subject": "BGS", "duration": "(9:05 PM - 10:15 PM)", "notes": "Review BGS chapters, focus on maps, historical events, important dates.", "start_time": "21:05", "end_time": "22:15" },
+                    { "id": "wed_block_review", "subject": "Quick Review & Plan", "duration": "(10:15 PM - 10:30 PM)", "notes": "Go over learned material, jot down tomorrow's tasks for organization.", "start_time": "22:15", "end_time": "22:30" }
+                ]
+            },
+            "Thursday": {
+                "time_block_display": "7:30 PM - 10:30 PM",
+                "sessions": [
+                    { "id": "thu_block_1", "subject": "Bangla", "duration": "(7:30 PM - 8:12 PM)", "notes": "Quick review or short, specific task.", "start_time": "19:30", "end_time": "20:12" },
+                    { "id": "thu_block_2", "subject": "BGS", "duration": "(8:12 PM - 8:54 PM)", "notes": "Quick review or short, specific task.", "start_time": "20:12", "end_time": "20:54" },
+                    { "id": "thu_block_3", "subject": "Islam Education", "duration": "(8:54 PM - 9:36 PM)", "notes": "Quick review or short, specific task.", "start_time": "20:54", "end_time": "21:36" },
+                    { "id": "thu_block_4", "subject": "ICT", "duration": "(9:36 PM - 10:18 PM)", "notes": "Quick review or short, specific task.", "start_time": "21:36", "end_time": "22:18" },
+                    { "id": "thu_block_review", "subject": "Quick Review & Plan", "duration": "(10:18 PM - 10:30 PM)", "notes": "Go over learned material, jot down tomorrow's tasks for organization.", "start_time": "22:18", "end_time": "22:30" }
+                ]
+            },
+            "Friday": {
+                "time_block_display": "7:30 PM - 10:30 PM",
+                "sessions": [
+                    { "id": "fri_block_1", "subject": "Math", "duration": "(7:30 PM - 8:55 PM)", "notes": "Review all Math topics from the week, tackle complex problems, or get a head start.", "start_time": "19:30", "end_time": "20:55" },
+                    { "id": "fri_block_break1", "subject": "Short Break", "duration": "(8:55 PM - 9:05 PM)", "notes": "Stretch, grab a drink, step away from desk. No phone scrolling!", "start_time": "20:55", "end_time": "21:05", "is_break": true },
+                    { "id": "fri_block_2", "subject": "Science", "duration": "(9:05 PM - 10:15 PM)", "notes": "Comprehensive review of the week's Science concepts, connect ideas.", "start_time": "21:05", "end_time": "22:15" },
+                    { "id": "fri_block_review", "subject": "Quick Review & Plan", "duration": "(10:15 PM - 10:30 PM)", "notes": "Go over learned material, jot down tomorrow's tasks for organization.", "start_time": "22:15", "end_time": "22:30" },
+                    { "id": "fri_block_planning", "subject": "Weekly Topic Planning", "duration": "(10:30 PM - 10:45 PM)", "notes": "Look ahead at syllabus/assignments, decide topics for next week. Flexibility is key!", "start_time": "22:30", "end_time": "22:45" }
+                ]
+            }
+        };
+
+        // NEW: Syllabus Data Structure
+        const syllabusData = {
+            "Bangla": [
+                "বাংলা ১ম পত্র: (সাহিত্য কণিকা)",
+                "— ক: (গদ্য) —",
+                "1. লাইব্রেরী",
+                "2. মংডুর পথে",
+                "3. বাংলা নববর্ষ",
+                "4. বাংলার ভাষার জন্মকথা",
+                "5. গণঅভ্যুত্থানের কথা",
+                "6. এবারের সংগ্রাম স্বাধীনতার সংগ্রাম",
+                "— খ: (কবিতা) —",
+                "1. আবার আসিব ফিরে",
+                "2. রুপাই",
+                "3. নদীর স্বপ্ন",
+                "4. জাগো তবে অরণ্য কন্যারা",
+                "5. প্রার্থী",
+                "6. একুশের গান",
+                "— গ: (আনন্দপাঠ) —",
+                "1. মুক্তি",
+                "2. ফিলিস্তিনের চিঠি",
+                "3. তিরন্দাজ",
+                "4. কাবুলের শেষ প্রহরে (ভ্রমণ-কাহিনি)",
+                "", // Spacer
+                "বাংলা ২য় পত্র: (বাংলা ভাষার ব্যাকরণ ও নির্মিতি)",
+                "— ক: (ব্যাকরন অংশ) —",
+                "3.1 সন্ধি",
+                "3.2 বিসর্গ সন্ধি",
+                "4.5 ধাতু ও ক্রিয়াপদ",
+                "4.6 সকর্মক ও অকর্মক ক্রিয়া",
+                "4.7 মৌলিক ও সাধিত ধাতু",
+                "4.8 ক্রিয়ার কাল",
+                "5 শব্দগঠন",
+                "5.1 ধনাত্মক শব্দ, অনুকার শব্দ ও শব্দদ্বৈত্য",
+                "5.2 শব্দগঠন: প্রাথমিক ধারণা",
+                "7.1 বিরাম চিহ্ন",
+                "7.2 কমা, সেমিকোলন, কোলন ও হাইফেন এর ব্যবহার",
+                "9. অভিধান",
+                "9.1 বর্ণানুক্রম",
+                "9.2 ভক্তি ও শীর্ষ শব্দ",
+                "10.2 সমার্থক শব্দ প্রয়োগে বাক্য রচনা",
+                "10.3 বিপরীতার্থক শব্দ প্রয়োগে বাক্য রচনা",
+                "— খ: (নির্মিতি অংশ) —",
+                "১: (অনুচ্ছেদ)",
+                "ক. বইমেলা",
+                "খ. স্বাধীনতা দিবস",
+                "গ. নারীর অধিকার",
+                "ঘ. যানজট",
+                "ঙ. শিষ্টাচার",
+                "চ. লোকশিল্প আমাদের ঐতিহ্য",
+                "— গ: (সারাংশ/সারমর্ম) —",
+                "১. আনন্দ প্রকাশ জীবনাশক্তির প্রবলতাই প্রকাশ...নানান অঙ্গিকের শিল্পকলা।",
+                "২. বাঙালি যেদিন ঐক্যবদ্ধ হয়ে বলতে...মৃতপ্রায় করে রাখে।",
+                "৩. মহাসমুদ্রের শত বৎসরের কল্লোল...বন্যাকে বাঁধিয়া রাখিয়াছে।",
+                "৪. নম নম নম সুন্দরী মম...চোখে আসে জল ভরে।",
+                "৫. সাম্যের গান গাই...শক্তি দিয়াছে বিজয়-লক্ষী নারী।",
+                "৬. শৈশবে সদুপদেশ যাহার না...তরী না আসিলে ফিরে?",
+                "— ৩: (ভাব সম্প্রসারণ) —",
+                "১. এই জগতে, হায়, সেই বেশি চায় আছে যার ভুরি ভুরি/ রাজার হস্ত করে সমস্ত কাঙালের ধন চুরি।",
+                "২. করিতে পারিনা কাজ/ সদা ভয়, সদা লাজ/ সংশয়ে সংকল্প সদা টলে/ পাছে লোকে কিছু বলে।",
+                "৩. লোভে পাপ, পাপে মৃত্যু।",
+                "৪. বিশ্বের যা কিছু মহান সৃষ্টি চির কল্যাণকর/ অর্ধেক তার করিয়াছে নারী অর্ধেক তার নর।",
+                "৫. জ্ঞানহীন মানুষ পশুর সমান।",
+                "— ৪: (চিঠিপত্র) —",
+                "১. কম্পিউটার শিক্ষার গুরুত্ব বর্ণনা করে তোমার ছোট বোনের কাছে একটি পত্র লেখ।",
+                "২. তোমার বন্ধুর মা হঠাৎ মারা গেছেন। তাকে সান্তনা জানিয়ে একটি পত্র লেখ।",
+                "৩. ধরো, তোমার পাড়ায় 'আঞ্চলিক মৈত্রী সংঘ' নামে একটি ক্লাব আছে। ক্লাবের পক্ষ থেকে বাংলা নববর্ষ উদযাপন উপলক্ষে একটি নিমন্ত্রণ পত্র রচনা করো।",
+                "৪. শিক্ষা সফরের গুরুত্ব উল্লেখ করে তোমার বিদ্যালয়ের প্রধান শিক্ষকের নিকট শিক্ষা সফরে যাওয়ার অনুমতি চেয়ে একটি আবেদনপত্র লেখ।",
+                "৫. তোমার স্কুলে একটি বিজ্ঞান ক্লাব গঠনের অনুমতি চেয়ে প্রধান শিক্ষকের নিকট একখানা আবেদন পত্র লেখ।",
+                "— ৫: (প্রবন্ধ-রচনা) —",
+                "১. বাংলা নববর্ষ",
+                "২. বিজয় দিবস",
+                "৩. বাংলাদেশের কৃষক",
+                "৪. ছাত্রজীবনের দায়িত্ব ও কর্তব্য",
+                "৫. পাঠাগারের প্রয়োজনীয়তা",
+                "৬. কর্মমুখী শিক্ষা",
+                "৭. অধ্যাবসায়"
+            ],
+            "Math": [
+                "— ক-বিভাগ (পাটিগণিত) —",
+                "অনুশীলনী 2.2 (সংশ্লিষ্ট উদাহরণসহ)",
+                "অধ্যায় 3",
+                "— খ-বিভাগ (বীজগণিত) —",
+                "অধ্যায় 6 (সম্পূর্ণ ও পরিশিষ্ট পৃষ্ঠা 195 থেকে 200)",
+                "— গ-বিভাগ (জ্যামিতি) —",
+                "অধ্যায় 9",
+                "অধ্যায় 10",
+                "— ঘ-বিভাগ (তথ্য ও উপাত্ত) —",
+                "অধ্যায় 11"
+            ],
+            "Islam Education": [
+                "প্রথম অধ্যায়ের: পাঠ 6, 7, 8, 9 ও 10",
+                "দ্বিতীয় অধ্যায়ের: পাঠ 6, 7, 8, 9 ও 10",
+                "তৃতীয় অধ্যায়ের: পাঠ 8, 9, 10, 11, 12, 13, 14 ও 15",
+                "চতুর্থ অধ্যায়ের: পাঠ 9, 10, 11, 12, 13, 14, 15 ও 16",
+                "পঞ্চম অধ্যায়ের: পাঠ 4, 5, 6 ও 7"
+            ],
+            "BGS": [
+                "অধ্যায় 2: ঔপনিবেশিক যুগের প্রত্নতাত্ত্বিক ঐতিহ্য",
+                "অধ্যায় 6: বাংলাদেশের সাংস্কৃতিক পরিবর্তন",
+                "অধ্যায় 8: বাংলাদেশের বিভিন্ন নৃ-গোষ্ঠী",
+                "অধ্যায় 9: বাংলাদেশের সামাজিক সমস্যা",
+                "অধ্যায় 10: বাংলাদেশের জনসংখ্যা ও উন্নয়ন",
+                "অধ্যায় 11: বাংলাদেশের জলবায়ু ও দুর্যোগ মোকাবেলা",
+                "অধ্যায় 13: বাংলাদেশ এবং বিভিন্ন আঞ্চলিক ও আন্তর্জাতিক সহযোগী সংস্থা"
+            ],
+            "Science": [
+                "তৃতীয় অধ্যায়: ব্যাপন, অভিস্রবণ ও প্রস্বেদন",
+                "চতুর্থ অধ্যায়: উদ্ভিদের বংশবৃদ্ধি",
+                "পঞ্চম অধ্যায়: সমন্বয় ও নিঃসরণ",
+                "নবম অধ্যায়: বর্তনী ও চলবিদ্যুৎ",
+                "দশম অধ্যায়: অম্ল, ক্ষারক ও লবণ",
+                "দ্বাদশ অধ্যায়: মহাকাশ ও উপগ্রহ",
+                "ত্রয়োদশ অধ্যায়: খাদ্য ও পুষ্টি"
+            ],
+            "ICT": [
+                "দ্বিতীয় অধ্যায়: কম্পিউটার নেটওয়ার্ক",
+                "চতুর্থ অধ্যায়: স্প্রেডশিটের ব্যবহার",
+                "পঞ্চম অধ্যায়: শিক্ষা ও দৈনন্দিন জীবনে ইন্টারনেটের ব্যবহার"
+            ],
+            "Quick Review & Plan": [
+                "No specific syllabus chapters. This session is for reviewing and planning tasks for the week."
+            ],
+            "Short Break": [
+                "No syllabus for breaks. Enjoy your time off!"
+            ],
+            "Weekly Topic Planning": [
+                "No specific syllabus chapters. This session is for looking ahead and deciding future topics."
+            ]
+        };
+
+
+        // Mapping of Date.getDay() numbers to your day names (Sunday is 0, Monday is 1, etc.)
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const today = new Date();
+        const currentDayName = days[today.getDay()];
+        const currentDayData = studyPlanData[currentDayName];
+
+        const pinnedCurrentDayContainer = document.getElementById('pinnedCurrentDay');
+        const allOtherDaysSchedule = document.getElementById('allOtherDaysSchedule');
+
+        // Clock and Date elements
+        const currentDayDisplay = document.getElementById('currentDayDisplay');
+        const liveClock = document.getElementById('liveClock');
+        const currentDateDisplay = document.getElementById('currentDateDisplay');
+
+        // Modal Elements
+        const syllabusModal = document.getElementById('syllabusModal');
+        const closeButton = syllabusModal.querySelector('.close-button');
+        const modalSubjectTitle = document.getElementById('modalSubjectTitle');
+        const modalChapterList = document.getElementById('modalChapterList');
+
+
+        // --- Function to update the live clock and date ---
+        function updateLiveClockAndDate() {
+            const now = new Date();
+
+            // Format time (e.g., 11:30:45 PM)
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const formattedTime = now.toLocaleTimeString('en-US', timeOptions);
+            liveClock.textContent = formattedTime;
+
+            // Format date (e.g., July 28, 2025)
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = now.toLocaleDateString('en-US', dateOptions);
+            currentDateDisplay.textContent = formattedDate;
+
+            // Update current day name (already available from currentDayName)
+            currentDayDisplay.textContent = currentDayName;
+        }
+
+
+        // --- Function to format time for comparison ---
+        function getMinutesSinceMidnight(timeString) {
+            if (!timeString) return -1;
+            const [hours, minutes] = timeString.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        // --- Function to render the pinned current day's routine ---
+        function renderPinnedCurrentDay() {
+            if (!currentDayData) {
+                pinnedCurrentDayContainer.innerHTML = `<p>No study routine defined for today (${currentDayName}).</p>`;
+                return;
+            }
+
+            let html = `<h2>Today's Schedule: ${currentDayName} Evenings (${currentDayData.time_block_display})</h2><ul>`;
+            currentDayData.sessions.forEach(session => {
+                const isBreakClass = session.is_break ? ' break' : '';
+                const dataSubjectAttr = session.subject ? `data-subject="${session.subject}"` : ''; // Add data-subject
+                html += `
+                    <li id="${session.id}" class="${isBreakClass}" data-start-time="${session.start_time}" data-end-time="${session.end_time}" ${dataSubjectAttr}>
+                        <strong>${session.subject}</strong> <span class="session-duration">${session.duration}</span>
+                        <div class="session-notes">${session.notes}</div>
+                    </li>
+                `;
+            });
+            html += `</ul>`;
+            pinnedCurrentDayContainer.innerHTML = html;
+            addSyllabusClickHandlers(); // Add handlers after rendering
+        }
+
+        // --- Function to update time highlights ---
+        function updateTimeHighlights() {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            // console.log(`Current time: ${now.toLocaleTimeString()}, Current minutes: ${currentMinutes}`); // For debugging
+
+            const currentDaySessions = pinnedCurrentDayContainer.querySelectorAll('li[data-start-time]');
+
+            currentDaySessions.forEach(sessionElement => {
+                const startTimeStr = sessionElement.getAttribute('data-start-time');
+                const endTimeStr = sessionElement.getAttribute('data-end-time');
+
+                if (!startTimeStr || !endTimeStr) {
+                    // console.warn(`Session element missing start_time or end_time:`, sessionElement); // For debugging
+                    return;
+                }
+
+                const startMinutes = getMinutesSinceMidnight(startTimeStr);
+                const endMinutes = getMinutesSinceMidnight(endTimeStr);
+
+                sessionElement.classList.remove('current-active', 'completed'); // Reset classes
+
+                // Check if the current time is within the session
+                if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                    sessionElement.classList.add('current-active');
+                    // console.log(`Active: ${sessionElement.id}`); // For debugging
+                }
+                // Check if the session has already passed
+                else if (currentMinutes >= endMinutes) {
+                    sessionElement.classList.add('completed');
+                    // console.log(`Completed: ${sessionElement.id}`); // For debugging
+                }
+            });
+        }
+
+        // Modal Functions
+        function openSyllabusModal(subjectName) {
+            modalSubjectTitle.textContent = `${subjectName} Syllabus`;
+            modalChapterList.innerHTML = ''; // Clear previous chapters
+
+            const chapters = syllabusData[subjectName];
+            if (chapters && chapters.length > 0) {
+                chapters.forEach(chapter => {
+                    const li = document.createElement('li');
+                    // Add a class for sections if the chapter starts with a known section marker (e.g., '—')
+                    if (chapter.startsWith('—')) {
+                        li.className = 'syllabus-section';
+                    }
+                    li.textContent = chapter;
+                    modalChapterList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = "Syllabus not found or no chapters defined for this subject.";
+                modalChapterList.appendChild(li);
+            }
+            syllabusModal.style.display = 'flex'; // Show the modal
+        }
+
+        function closeSyllabusModal() {
+            syllabusModal.style.display = 'none'; // Hide the modal
+        }
+
+        // Add click handlers to subjects
+        function addSyllabusClickHandlers() {
+            // Get all list items that are not breaks and have a data-subject attribute
+            const subjectListItems = document.querySelectorAll('li:not(.break)[data-subject]');
+
+            subjectListItems.forEach(item => {
+                // Remove existing listener to prevent duplicates if function is called multiple times
+                item.removeEventListener('click', handleSubjectClick);
+                // Add the new listener
+                item.addEventListener('click', handleSubjectClick);
+            });
+        }
+
+        function handleSubjectClick(event) {
+            const subject = event.currentTarget.getAttribute('data-subject');
+            if (subject) {
+                openSyllabusModal(subject);
+            }
+        }
+
+
+        // --- Initialize everything on load ---
+        updateLiveClockAndDate(); // Set initial clock and date
+        renderPinnedCurrentDay(); // Render the pinned current day's routine
+        updateTimeHighlights(); // Initial highlight
+
+        // Update clock every second
+        setInterval(updateLiveClockAndDate, 1000); // Check every 1 second
+
+        // Update routine highlights every minute
+        setInterval(updateTimeHighlights, 60 * 1000); // Check every 60 seconds
+
+        // --- Accordion logic for other days ---
+        const dayHeaders = document.querySelectorAll('#allOtherDaysSchedule .day-header');
+        const dayContents = document.querySelectorAll('#allOtherDaysSchedule .day-content');
+
+        dayHeaders.forEach((header, index) => {
+            const dayOfWeek = header.getAttribute('data-day');
+            const content = dayContents[index];
+            const toggleIcon = header.querySelector('.toggle-icon');
+
+            // Set initial state: all hidden, current day handled by pinning
+            content.classList.remove('active');
+            toggleIcon.textContent = '+'; // Plus sign for collapsed
+
+            // If it's the current day, it should *not* appear in the accordion section
+            // We hide it from the accordion completely to avoid duplication
+            if (dayOfWeek === currentDayName) {
+                header.style.display = 'none';
+                content.style.display = 'none';
+            } else {
+                header.addEventListener('click', () => {
+                    const isActive = content.classList.contains('active');
+                    if (isActive) {
+                        content.classList.remove('active');
+                        toggleIcon.textContent = '+';
+                    } else {
+                        // Close all other open sections (accordion behavior)
+                        dayContents.forEach(otherContent => {
+                            if (otherContent !== content && otherContent.classList.contains('active')) {
+                                otherContent.classList.remove('active');
+                                const otherHeader = otherContent.previousElementSibling;
+                                otherHeader.querySelector('.toggle-icon').textContent = '+';
+                            }
+                        });
+                        content.classList.add('active');
+                        toggleIcon.textContent = '−';
+                    }
+                    // After opening/closing accordion, add/re-add click handlers for subjects within
+                    addSyllabusClickHandlers();
+                });
+            }
+        });
+
+        // Event listener for the modal close button
+        closeButton.addEventListener('click', closeSyllabusModal);
+
+        // Event listener to close modal if clicked outside modal content
+        syllabusModal.addEventListener('click', (event) => {
+            if (event.target === syllabusModal) {
+                closeSyllabusModal();
+            }
+        });
+
+        // Initial setup for click handlers on all list items
+        addSyllabusClickHandlers();
+
+    </script>
+</body>
+</html>
